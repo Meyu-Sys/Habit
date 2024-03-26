@@ -18,8 +18,8 @@ def main():
         case '3':
             view()
         case _:
-            print('Invalid input. Please try again.')
-            main()
+            f.close()
+            sys.exit()
 
 def create():
     hname = input('Enter the name of the habit: ')
@@ -43,11 +43,12 @@ def log():
 
 def view():
     print('Here are your habits:')
-    print(tabulate.tabulate(data, headers='firstrow', tablefmt='fancy_grid'))
+    print(tabulate.tabulate(list(reader), headers='firstrow', tablefmt='fancy_grid'))
     match input('Press 1 to go back to the main menu or anything else to quit.'):
         case '1':
             main()
         case _:
+            f.close()
             sys.exit()
 
 fields = ['habit', 'days', 'date', 'logs']
@@ -56,10 +57,18 @@ f = open('habits.csv', 'a+')
 if os.path.exists('habits.csv'):
     reader = csv.DictReader(f)
     writer = csv.DictWriter(f, fieldnames=fields)
-    data = list(reader)
 else:
     writer = csv.DictWriter(f, fieldnames=fields)
     writer.writeheader()
     reader = csv.DictReader(f)
-    data = list(reader)
-main()
+
+if __name__ == '__main__':
+    main()
+else:
+    print(reader)
+    f.close()
+
+## TODO: Add log() function]
+## TODO: Fix view() function
+    ## Maybe open and close flie evry time a new operation is done alongside reader and writer
+    ## TODO: Calculate amount of days habit should have been done until today
