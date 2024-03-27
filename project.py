@@ -5,6 +5,7 @@ import tabulate
 import sys
 
 def main():
+    clear()
     print('Welcome to Habit Tracker!')
     print('What would you like to do?')
     print('1. Create a new habit')
@@ -22,6 +23,9 @@ def main():
             sys.exit()
 
 def create():
+    f = open('habits.csv', 'a', newline='')
+    writer = csv.DictWriter(f, fieldnames=fields)
+    clear()
     hname = input('Enter the name of the habit: ')
     freq = input('Enter the number of days in a week you want to repeat this habit: ')
     hdays = []
@@ -35,6 +39,7 @@ def create():
     hlogs = 0
     writer.writerow({'habit': hname, 'days': hdays, 'date': hdate, 'logs': hlogs})
     print('Habit created successfully!')
+    f.close()
     view()
 
 
@@ -42,33 +47,39 @@ def log():
     ...
 
 def view():
+    f = open('habits.csv', 'r')
+    reader = csv.DictReader(f)
+    clear()
     print('Here are your habits:')
     print(tabulate.tabulate(list(reader), headers='firstrow', tablefmt='fancy_grid'))
     match input('Press 1 to go back to the main menu or anything else to quit.'):
         case '1':
+            f.close()
             main()
         case _:
             f.close()
             sys.exit()
 
+def clear():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
 fields = ['habit', 'days', 'date', 'logs']
 Days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-f = open('habits.csv', 'a+')
-if os.path.exists('habits.csv'):
-    reader = csv.DictReader(f)
-    writer = csv.DictWriter(f, fieldnames=fields)
-else:
+if not os.path.exists('habits.csv'):
+    if os.name == 'nt':
+        f = open('./habits.csv', 'a', newline='')
+    else:
+        os.mknod('./habits.csv')
+        f = open('./habits.csv', 'a')
     writer = csv.DictWriter(f, fieldnames=fields)
     writer.writeheader()
-    reader = csv.DictReader(f)
-
-if __name__ == '__main__':
-    main()
-else:
-    print(reader)
     f.close()
+main()
 
 ## TODO: Add log() function]
 ## TODO: Fix view() function
-    ## Maybe open and close flie evry time a new operation is done alongside reader and writer
+    ## Maybe open and close file evry time a new operation is done alongside reader and writer
     ## TODO: Calculate amount of days habit should have been done until today
