@@ -11,6 +11,7 @@ DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun
 
 def main():
     clear()
+
     print('Welcome to Habit Tracker!')
     print('What would you like to do?')
     print('1. Create a new habit')
@@ -58,24 +59,30 @@ def log():
 
     with open('habits.csv', 'r') as f:
         reader = csv.reader(f)
-        todaylog = [['Habit', 'Days', 'Date', 'Logs']]
+        todaylog = []
+        lines = []
 
         for row in reader:
             if tod(row[1], datetime.datetime.today()):
                 todaylog.append(row)
+            lines.append(row)
 
         print('Here are the habits you need to log today:')
-        print(tabulate.tabulate(todaylog, tablefmt='fancy_grid', headers='firstrow'))
+        print(tabulate.tabulate(todaylog, tablefmt='fancy_grid', headers=FIELDS))
 
         hname = input('Enter the name of the habit you want to log: ')
-        for row in reader:
-            if row[0] == hname:
-                row[3] += 1
+        for n in range(len(lines)):
+            if lines[n][0] == hname:
+                lines[n][3] = 1 + int(lines[n][3])
                 print('Habit logged successfully!')
                 break
             else:
                 print('Habit not found. Please try again.')
                 log()
+
+    with open('habits.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(lines)
 
     print('press 1 to go back to the main menu or anything else to quit.')
     match input():
@@ -92,7 +99,7 @@ def view():
         reader = csv.reader(f)
 
         print('Here are your habits:')
-        print(tabulate.tabulate(reader, headers='firstrow', tablefmt='fancy_grid'))
+        print(tabulate.tabulate(reader, headers=FIELDS, tablefmt='fancy_grid'))
 
         match input('Press 1 to go back to the main menu or anything else to quit.'):
             case '1':
@@ -111,6 +118,7 @@ def clear():
 def tod(x, date) -> bool:
     day = date.weekday()
     today = DAYS[day]
+    print(today, x)
     if today in x:
         return True
     else:
@@ -120,9 +128,4 @@ def tod(x, date) -> bool:
 if not os.path.exists('habits.csv'):
     h = Path('habits.csv')
     h.touch()
-    f = open('habits.csv', 'a', newline='')
-    writer = csv.writer(f,)
-    writer.writerow(FIELDS)
-    f.close()
-
 main()
