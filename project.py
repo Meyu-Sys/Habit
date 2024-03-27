@@ -3,6 +3,7 @@ import os
 import datetime
 import tabulate
 import sys
+from pathlib import Path
 
 def main():
     clear()
@@ -24,7 +25,7 @@ def main():
 
 def create():
     f = open('habits.csv', 'a', newline='')
-    writer = csv.DictWriter(f, fieldnames=fields)
+    writer = csv.writer(f, fieldnames=fields)
     clear()
     hname = input('Enter the name of the habit: ')
     freq = input('Enter the number of days in a week you want to repeat this habit: ')
@@ -37,21 +38,39 @@ def create():
         hdays.append(day)
     hdate = datetime.date.today()
     hlogs = 0
-    writer.writerow({'habit': hname, 'days': hdays, 'date': hdate, 'logs': hlogs})
+    writer.writerow([hname, hdays, hdate, hlogs])
     print('Habit created successfully!')
     f.close()
     view()
 
 
 def log():
-    ...
+    clear()
+    f = open('habits.csv', 'a', newline='')
+    reader = csv.reader(f)
+    todaylog = filter(reader, tod(reader[1]))
+    print('Here are the habits you need to log today:')
+    print(tabulate.tabulate(todaylog, tablefmt='fancy_grid', headers='none'))
+    hname = input('Enter the name of the habit you want to log: ')
+    for row in reader:
+        if row[0] == hname:
+            row[3] += 1
+            print('Habit logged successfully!')
+            break
+    f.close()
+    print('press 1 to go back to the main menu or anything else to quit.')
+    match input():
+        case '1':
+            main()
+        case _:
+            sys.exit()
 
 def view():
     f = open('habits.csv', 'r')
-    reader = csv.DictReader(f)
+    reader = csv.reader(f)
     clear()
     print('Here are your habits:')
-    print(tabulate.tabulate(list(reader), headers='firstrow', tablefmt='fancy_grid'))
+    print(tabulate.tabulate(reader, headers='firstrow', tablefmt='fancy_grid'))
     match input('Press 1 to go back to the main menu or anything else to quit.'):
         case '1':
             f.close()
@@ -66,20 +85,40 @@ def clear():
     else:
         os.system('clear')
 
-fields = ['habit', 'days', 'date', 'logs']
+def tod(x) -> bool:
+    todayday = datetime.datetime.today().weekday()
+    match todayday:
+        case 0:
+            today = 'Monday'
+        case 1:
+            today = 'Tuesday'
+        case 2:
+            today = 'Wednesday'
+        case 3:
+            today = 'Thursday'
+        case 4:
+            today = 'Friday'
+        case 5:
+            today = 'Saturday'
+        case 6:
+            today = 'Sunday'
+    if today in x:
+        return True
+    else:
+        return False
+
+fields = ['Habit', 'Days', 'Date', 'Logs']
 Days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 if not os.path.exists('habits.csv'):
-    if os.name == 'nt':
-        f = open('./habits.csv', 'a', newline='')
-    else:
-        os.mknod('./habits.csv')
-        f = open('./habits.csv', 'a')
-    writer = csv.DictWriter(f, fieldnames=fields)
-    writer.writeheader()
+    h = Path('habits.csv')
+    h.touch()
+    f = open('habits.csv', 'a', newline='')
+    writer = csv.writer(f,)
+    writer.writerow(fields)
     f.close()
 main()
 
+
 ## TODO: Add log() function]
 ## TODO: Fix view() function
-    ## Maybe open and close file evry time a new operation is done alongside reader and writer
     ## TODO: Calculate amount of days habit should have been done until today
