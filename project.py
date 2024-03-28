@@ -22,9 +22,17 @@ def main():
         case '1':
             clear()
             create(NAME)
+            if input('press 1 to go back to the main menu or anything else to quit.') == '1':
+                main()
+            else:
+                sys.exit()
         case '2':
             clear()
             log(NAME)
+            if input('press 1 to go back to the main menu or anything else to quit.') == '1':
+                main()
+            else:
+                sys.exit()
         case '3':
             clear()
             print('Here are your habits:')
@@ -79,13 +87,18 @@ def log(file=NAME):
         print(tabulate.tabulate(todaylog, tablefmt='fancy_grid', headers=FIELDS))
 
         hname = input('Enter the name of the habit you want to log: ')
+        flag = False
         for n in range(len(lines)):
             if lines[n][0] == hname:
                 lines[n][3] = 1 + int(lines[n][3])
                 print('Habit logged successfully!')
+                flag = True
                 break
             else:
                 continue
+        if not flag:
+            print('Habit not found. Please try again.')
+            sys.exit()
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(lines)
@@ -108,7 +121,6 @@ def clear():
 def tod(x, date) -> bool:
     day = date.weekday()
     today = DAYS[day]
-    print(today, x)
     if today in x:
         return True
     else:
