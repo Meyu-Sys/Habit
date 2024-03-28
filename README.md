@@ -19,6 +19,7 @@ The tests for this might just have been the most difficult thing I've ever done.
 * Then it logs a habit and checks if it worked
 * It then views the habit to check if it works properly
 * There's also a test for `tod()`
+
 There was no difficulty in figuring out what to test the difficulty was in the how. I used unittest.patch to simulate human input. It was hard to learn how to do this as the python documentation is abhorent and could possibly lead to someone unlearning the language. After I figured out how to do that I started to get `StopIteration` error which occurs when you don't have enough inputs. I checked again and again counting all the calls for input and their exact order to make sure I wasn't messing anything up. I learned that i needed to use `itertools.cycle` to load the inputs. And after all that suffering it was finally done
 
 ## How to use
