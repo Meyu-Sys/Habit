@@ -86,7 +86,6 @@ def log(file=NAME):
                 break
             else:
                 continue
-
     with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(lines)
