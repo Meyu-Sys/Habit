@@ -1,8 +1,10 @@
 import project
 import datetime
+from unittest.mock import patch
 import unittest
-import csv
 import tabulate
+import os
+import csv
 
 def test_tod():
     assert project.tod(['Wednesday'], datetime.date(2024,3,27)) == True
@@ -10,8 +12,24 @@ def test_tod():
     assert project.tod(['Monday', 'Wednesday'], datetime.date(2024,3,27)) == True
     assert project.tod(['Monday', 'Wednesday'], datetime.date(2024,3,28)) == False
 
-def test_view():
-    assert project.view('test.csv') == tabulate.tabulate([['test', 'test', 'test', '1']], headers=project.FIELDS, tablefmt='fancy_grid')
-    assert project.view('test2.csv') == tabulate.tabulate([['test', 'test', 'test', '0'], ['test', 'test', 'test', '2']], headers=project.FIELDS, tablefmt='fancy_grid')
+def test_createcsv():
+    project.createcsv('test.csv')
+    assert os.path.exists('test.csv') == True
 
-def test_cr
+def test_create():
+    with patch('builtins.input', side_effect=['test','7','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']):
+        project.create('test.csv')
+    with open('test.csv', 'r') as f:
+        reader = list(csv.reader(f))
+        assert reader == [['test', "['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']", '2024-03-28', '0']]
+
+def test_log():
+    with patch('builtins.input', side_effect=['test']):
+        project.log('test.csv')
+    with open('test.csv', 'r') as f:
+        reader = list(csv.reader(f))
+        assert reader == [['test', "['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']", '2024-03-28', '1']]
+
+
+def test_view():
+    assert project.view('test.csv') == tabulate.tabulate([['test', "['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']", '2024-03-28', '1']], headers=project.FIELDS, tablefmt='fancy_grid')

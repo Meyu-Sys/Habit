@@ -20,19 +20,26 @@ def main():
     choice = input('Enter the number of your choice: ')
     match choice:
         case '1':
-            create()
+            create(NAME)
         case '2':
-            log()
+            log(NAME)
         case '3':
             print('Here are your habits:')
             print(view(NAME))
+            coy = input('press 1 to go back to the main menu or anything else to quit.')
+            match coy:
+                case '1':
+                    main()
+                case _:
+                    sys.exit()
+
         case _:
             sys.exit()
 
 
-def create():
-    with open('habits.csv', 'a+', newline='') as f:
-        clear()
+def create(file=NAME):
+    clear()
+    with open(file, 'a+', newline='') as f:
 
         writer = csv.writer(f)
         hname = input('Enter the name of the habit: ')
@@ -51,14 +58,19 @@ def create():
         writer.writerow([hname, hdays, hdate, hlogs])
 
         print('Habit created successfully!')
-    print('Here are your habits:')
     print(view(NAME))
+    coy = input('press 1 to go back to the main menu or anything else to quit.')
+    match coy:
+        case '1':
+            main()
+        case _:
+            sys.exit()
 
 
-def log():
+def log(file=NAME):
     clear()
 
-    with open('habits.csv', 'r') as f:
+    with open(file, 'r') as f:
         reader = csv.reader(f)
         todaylog = []
         lines = []
@@ -78,10 +90,9 @@ def log():
                 print('Habit logged successfully!')
                 break
             else:
-                print('Habit not found. Please try again.')
-                log()
+                continue
 
-    with open('habits.csv', 'w', newline='') as f:
+    with open(file, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(lines)
 
@@ -93,9 +104,9 @@ def log():
             sys.exit()
 
 
-def view(p):
+def view(file=NAME):
     clear()
-    with open(p, 'r') as f:
+    with open(file, 'r') as f:
         reader = csv.reader(f)
         return tabulate.tabulate(reader, headers=FIELDS, tablefmt='fancy_grid')
 
