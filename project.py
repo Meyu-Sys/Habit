@@ -20,10 +20,13 @@ def main():
     choice = input('Enter the number of your choice: ')
     match choice:
         case '1':
+            clear()
             create(NAME)
         case '2':
+            clear()
             log(NAME)
         case '3':
+            clear()
             print('Here are your habits:')
             print(view(NAME))
             coy = input('press 1 to go back to the main menu or anything else to quit.')
@@ -38,7 +41,6 @@ def main():
 
 
 def create(file=NAME):
-    clear()
     with open(file, 'a+', newline='') as f:
 
         writer = csv.writer(f)
@@ -52,24 +54,17 @@ def create(file=NAME):
             day = input('Enter the day: ')
             if day not in DAYS:
                 print('Invalid day. Please try again.')
-                create()
-            hdays.append(day)
+                sys.exit()
+            else:
+                hdays.append(day)
 
         writer.writerow([hname, hdays, hdate, hlogs])
 
         print('Habit created successfully!')
     print(view(NAME))
-    coy = input('press 1 to go back to the main menu or anything else to quit.')
-    match coy:
-        case '1':
-            main()
-        case _:
-            sys.exit()
 
 
 def log(file=NAME):
-    clear()
-
     with open(file, 'r') as f:
         reader = csv.reader(f)
         todaylog = []
@@ -96,16 +91,9 @@ def log(file=NAME):
         writer = csv.writer(f)
         writer.writerows(lines)
 
-    print('press 1 to go back to the main menu or anything else to quit.')
-    match input():
-        case '1':
-            main()
-        case _:
-            sys.exit()
 
 
 def view(file=NAME):
-    clear()
     with open(file, 'r') as f:
         reader = csv.reader(f)
         return tabulate.tabulate(reader, headers=FIELDS, tablefmt='fancy_grid')
