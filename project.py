@@ -3,11 +3,10 @@ import os
 import datetime
 import tabulate
 import sys
-from pathlib import Path
 
 FIELDS = ['Habit', 'Days', 'Date', 'Logs']
 DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
+NAME = 'habits.csv'
 
 def main():
     clear()
@@ -18,15 +17,16 @@ def main():
     print('2. Log a habit')
     print('3. View habits')
 
-    match input('Enter the number of your choice: '):
+    choice = input('Enter the number of your choice: ')
+    match choice:
         case '1':
             create()
         case '2':
             log()
         case '3':
-            view()
+            print('Here are your habits:')
+            print(view(NAME))
         case _:
-            f.close()
             sys.exit()
 
 
@@ -51,7 +51,8 @@ def create():
         writer.writerow([hname, hdays, hdate, hlogs])
 
         print('Habit created successfully!')
-    view()
+    print('Here are your habits:')
+    print(view(NAME))
 
 
 def log():
@@ -92,20 +93,11 @@ def log():
             sys.exit()
 
 
-def view():
+def view(p):
     clear()
-
-    with open('habits.csv', 'r') as f:
+    with open(p, 'r') as f:
         reader = csv.reader(f)
-
-        print('Here are your habits:')
-        print(tabulate.tabulate(reader, headers=FIELDS, tablefmt='fancy_grid'))
-
-        match input('Press 1 to go back to the main menu or anything else to quit.'):
-            case '1':
-                main()
-            case _:
-                sys.exit()
+        return tabulate.tabulate(reader, headers=FIELDS, tablefmt='fancy_grid')
 
 
 def clear():
@@ -125,7 +117,13 @@ def tod(x, date) -> bool:
         return False
 
 
-if not os.path.exists('habits.csv'):
-    h = Path('habits.csv')
-    h.touch()
-main()
+def createcsv(file):
+    with open(file, 'w', newline='') as f:
+        writer = csv.writer(f)
+
+
+if not os.path.exists(NAME):
+    createcsv(NAME)
+
+if __name__ == '__main__':
+    main()
